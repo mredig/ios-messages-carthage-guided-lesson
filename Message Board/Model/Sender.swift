@@ -15,5 +15,20 @@ struct Sender: SenderType {
 }
 
 extension Sender: Codable {
+	static func setDefault(sender: Sender) {
+		let encoder = PropertyListEncoder()
+		do {
+			let data = try encoder.encode(sender)
+			UserDefaults.standard.set(data, forKey: "DefaultSender")
+		} catch {
+			NSLog("Error saving default sender: \(error)")
+		}
+	}
 
+	static func defaultSender() -> Sender? {
+		guard let data = UserDefaults.standard.data(forKey: "DefaultSender") else { return nil }
+
+		let decoder = PropertyListDecoder()
+		return try? decoder.decode(Sender.self, from: data)
+	}
 }

@@ -10,6 +10,39 @@ import UIKit
 
 class MessageThreadsTableViewController: UITableViewController {
 
+
+	// MARK: - Properties
+
+	let messageThreadController = MessageThreadController()
+
+	@IBOutlet weak var threadTitleTextField: UITextField!
+
+	override func viewDidLoad() {
+		if let defaultUser = Sender.defaultSender() {
+			messageThreadController.currentUser = defaultUser
+		} else {
+			presentUsernameSubmissionsAlert()
+
+		}
+	}
+
+	private func presentUsernameSubmissionsAlert() {
+		let alert = UIAlertController(title: "Enter a username:", message: "WHO ARE YOU?!", preferredStyle: .alert)
+		var userTextField: UITextField!
+		alert.addTextField { (textField) in
+			textField.placeholder = "I'm Mr. Meeseeks! Look at me!"
+			userTextField = textField
+		}
+		let submitAction = UIAlertAction(title: "Submit", style: .default) { _ in
+			guard let username = userTextField.text else { return }
+			let sender = Sender(senderId: UUID().uuidString, displayName: username)
+			Sender.setDefault(sender: sender)
+			self.messageThreadController.currentUser = Sender.defaultSender()
+		}
+		alert.addAction(submitAction)
+		present(alert, animated: true)
+	}
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -61,10 +94,5 @@ class MessageThreadsTableViewController: UITableViewController {
             destinationVC.messageThread = messageThreadController.messageThreads[indexPath.row]
         }
     }
-    
-    // MARK: - Properties
-    
-    let messageThreadController = MessageThreadController()
-    
-    @IBOutlet weak var threadTitleTextField: UITextField!
+
 }

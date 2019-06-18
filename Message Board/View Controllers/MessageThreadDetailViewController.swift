@@ -8,6 +8,7 @@
 
 import UIKit
 import MessageKit
+import InputBarAccessoryView
 
 class MessageThreadDetailViewController: MessagesViewController {
 	var messageThread: MessageThread?
@@ -16,6 +17,7 @@ class MessageThreadDetailViewController: MessagesViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
+		messageInputBar.delegate = self
 		messagesCollectionView.messagesDataSource = self
 		messagesCollectionView.messagesLayoutDelegate = self
 		messagesCollectionView.messagesDisplayDelegate = self
@@ -24,7 +26,7 @@ class MessageThreadDetailViewController: MessagesViewController {
 
 extension MessageThreadDetailViewController: MessagesDataSource {
 	func currentSender() -> SenderType {
-		return Sender(senderId: "I AM LORDE YAYAYA", displayName: "Pizza")
+		return messageThreadController?.currentUser ?? Sender(senderId: "I AM LORDE YAYAYA", displayName: "Pizza")
 	}
 
 	func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
@@ -49,4 +51,14 @@ extension MessageThreadDetailViewController: MessagesDisplayDelegate {
 	
 }
 
-
+extension MessageThreadDetailViewController: InputBarAccessoryViewDelegate {
+	func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
+		guard let messageThread = messageThread, let sender = messageThreadController?.currentUser else { return }
+		messageThreadController?.createMessage(in: messageThread, withText: text, sender: sender, completion: {
+			DispatchQueue.main.async {
+				self.messagesCollectionView.reloadData()
+				inputBar.inputTextView.text = ""
+			}
+		})
+	}
+}

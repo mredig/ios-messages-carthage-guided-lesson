@@ -9,7 +9,10 @@
 import Foundation
 
 class MessageThreadController {
-    
+
+	static let baseURL = URL(string: "https://lambda-message-board.firebaseio.com/withframeworks")!
+	var messageThreads: [MessageThread] = []
+
     func fetchMessageThreads(completion: @escaping () -> Void) {
         
         let requestURL = MessageThreadController.baseURL.appendingPathExtension("json")
@@ -65,15 +68,18 @@ class MessageThreadController {
         }.resume()
     }
     
-    func createMessage(in messageThread: MessageThread, withText text: String, sender: String, completion: @escaping () -> Void) {
+    func createMessage(in messageThread: MessageThread, withText text: String, sender: Sender, completion: @escaping () -> Void) {
         
         guard let index = messageThreads.index(of: messageThread) else { completion(); return }
         
-        let message = MessageThread.Message(text: text)
+        let message = MessageThread.Message(text: text, sender: sender)
         
         messageThreads[index].messages.append(message)
         
-        let requestURL = MessageThreadController.baseURL.appendingPathComponent(messageThread.identifier).appendingPathComponent("messages").appendingPathExtension("json")
+        let requestURL = MessageThreadController.baseURL
+			.appendingPathComponent(messageThread.identifier)
+			.appendingPathComponent("messages")
+			.appendingPathExtension("json")
         
         var request = URLRequest(url: requestURL)
         
@@ -97,7 +103,4 @@ class MessageThreadController {
             
         }.resume()
     }
-    
-    static let baseURL = URL(string: "https://lambda-message-board.firebaseio.com/withframeworks")!
-    var messageThreads: [MessageThread] = []
 }

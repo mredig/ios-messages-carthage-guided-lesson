@@ -38,6 +38,26 @@ class MessageThread: Codable, Equatable {
     
     
     struct Message: Codable, Equatable, MessageType {
+
+		// MARK: - MessageType
+		var sentDate: Date { return timestamp }
+		var kind: MessageKind { return .text(text) }
+		var sender: SenderType {
+			return Sender(senderId: senderID, displayName: displayName)
+		}
+
+		let text: String
+		let displayName: String
+		let senderID: String
+		let timestamp: Date
+		let messageId: String
+
+		enum CodingKeys: String, CodingKey {
+			case displayName
+			case senderID
+			case text
+			case timestamp
+		}
         
         init(text: String, sender: Sender, timestamp: Date = Date(), messageId: String = UUID().uuidString) {
             self.text = text
@@ -67,26 +87,6 @@ class MessageThread: Codable, Equatable {
             try container.encode(senderID, forKey: .senderID)
             try container.encode(timestamp, forKey: .timestamp)
             try container.encode(text, forKey: .text)
-        }
-        
-        let text: String
-        let displayName: String
-        let senderID: String
-        let timestamp: Date
-        let messageId: String
-        
-        enum CodingKeys: String, CodingKey {
-            case displayName
-            case senderID
-            case text
-            case timestamp
-        }
-        
-        // MARK: - MessageType
-        var sentDate: Date { return timestamp }
-        var kind: MessageKind { return .text(text) }
-        var sender: SenderType {
-            return Sender(senderId: senderID, displayName: displayName)
         }
     }
     

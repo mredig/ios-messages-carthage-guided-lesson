@@ -96,9 +96,3 @@ class MessageThread: Codable, Equatable {
             lhs.messages == rhs.messages
     }
 }
-
-
-struct Sender: SenderType {
-    var senderId: String
-    var displayName: String
-}
